@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PixCut — Edit Smarter</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0b0c10;
+    --ink-soft: #3a3c45;
+    --ink-muted: #7a7d8a;
+    --surface: #ffffff;
+    --surface-2: #f5f4f0;
+    --surface-3: #eceae4;
+    --accent: #5b3de8;
+    --accent-warm: #e85b3d;
+    --accent-pale: #ede9fc;
+    --border: rgba(11,12,16,0.1);
+    --radius: 16px;
+    --radius-sm: 8px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 72px 32px 64px;
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .hero-text {}
+
+  .app-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-pale);
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  .app-badge .dot {
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(42px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-desc {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--ink-soft);
+    line-height: 1.65;
+    margin-bottom: 32px;
+    max-width: 380px;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ink);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 14px 24px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: transform 0.15s, background 0.15s;
+  }
+
+  .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    font-weight: 400;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .btn-secondary:hover { color: var(--accent); }
+
+  .version-tag {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 16px;
+  }
+
+  .version-tag strong { color: var(--accent); }
+
+  /* PHONE MOCKUP */
+  .phone-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  .phone {
+    width: 220px;
+    background: #0d1117;
+    border-radius: 36px;
+    padding: 20px 14px 14px;
+    border: 1.5px solid rgba(255,255,255,0.08);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12);
+    position: relative;
+  }
+
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 48px; height: 5px;
+    background: #1f2230;
+    border-radius: 10px;
+  }
+
+  .phone-header { margin-bottom: 14px; padding: 6px 0; }
+  .phone-title { color: #fff; font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+  .phone-sub { color: #555970; font-size: 10px; margin-top: 1px; }
+
+  .phone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+
+  .phone-card {
+    background: #161b27;
+    border-radius: 10px;
+    padding: 10px 8px 8px;
+  }
+
+  .phone-icon {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, #5b3de8, #9b6dff);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .phone-icon svg { width: 15px; height: 15px; }
+
+  .phone-card-title { color: #fff; font-size: 9px; font-weight: 600; line-height: 1.2; margin-bottom: 2px; }
+  .phone-card-sub { color: #505570; font-size: 8px; line-height: 1.3; }
+  .phone-card-line { width: 14px; height: 1.5px; background: linear-gradient(90deg, #5b3de8, transparent); margin-top: 6px; border-radius: 2px; }
+
+  .phone-nav {
+    display: flex; justify-content: space-around;
+    padding: 12px 0 4px;
+    border-top: 0.5px solid #1f2937;
+    margin-top: 10px;
+  }
+
+  .phone-nav span { color: #fff; font-size: 8px; font-weight: 600; }
+  .phone-nav span.muted { color: #3d4155; font-weight: 400; }
+
+  /* WHAT'S NEW BANNER */
+  .new-banner {
+    background: var(--ink);
+    color: #fff;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    overflow: hidden;
+  }
+
+  .new-banner-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-pale);
+    opacity: 0.7;
+    white-space: nowrap;
+  }
+
+  .new-items {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+
+  .new-pill {
+    background: rgba(255,255,255,0.07);
+    border: 0.5px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .new-pill.accent {
+    background: var(--accent);
+    border-color: transparent;
+    color: #fff;
+  }
+
+  /* FEATURES SECTION */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 64px 32px;
+  }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: 40px;
+    color: var(--ink);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .feature-item {
+    background: var(--surface);
+    padding: 28px 24px;
+    transition: background 0.15s;
+  }
+
+  .feature-item:hover { background: var(--accent-pale); }
+
+  .feature-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-muted);
+    margin-bottom: 14px;
+    letter-spacing: 0.05em;
+  }
+
+  .feature-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .feature-desc {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    font-weight: 300;
+  }
+
+  /* CHANGELOG */
+  .changelog-wrap {
+    background: var(--surface-2);
+    border-radius: var(--radius);
+    padding: 36px;
+  }
+
+  .version-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .version-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .version-date {
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+
+  .changelog-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .changelog-list li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  .changelog-list li::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  /* WHO IT'S FOR */
+  .audience-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+
+  .audience-card {
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    padding: 20px 16px;
+    text-align: center;
+    transition: background 0.15s, transform 0.15s;
+  }
+
+  .audience-card:hover { background: var(--accent-pale); transform: translateY(-2px); }
+
+  .audience-icon {
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: center;
+    color: var(--accent);
+  }
+
+  .audience-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .audience-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    line-height: 1.3;
+  }
+
+  /* BOTTOM CTA */
+  .bottom-cta {
+    background: var(--ink);
+    padding: 72px 32px;
+    text-align: center;
+  }
+
+  .bottom-cta h2 {
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(30px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 16px;
+  }
+
+  .bottom-cta h2 em {
+    color: #9b6dff;
+    font-style: normal;
+  }
+
+  .bottom-cta p {
+    color: rgba(255,255,255,0.5);
+    font-size: 15px;
+    margin-bottom: 36px;
+    font-weight: 300;
+  }
+
+  .btn-white {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 15px 28px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: transform 0.15s, background 0.15s;
+  }
+
+  .btn-white:hover { background: var(--accent-pale); transform: translateY(-2px); }
+
+  .store-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .store-badge {
+    background: rgba(255,255,255,0.07);
+    border: 0.5px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.6);
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 100px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--surface-2);
+    padding: 64px 32px 48px;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-content {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 24px;
+  }
+
+  .footer-links a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+
+  .footer-links a:hover {
+    color: var(--accent);
+  }
+
+  .copyright {
+    color: var(--ink-muted);
+    font-size: 13px;
+  }
+
+  @media (max-width: 900px) {
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .audience-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 680px) {
+    .hero { grid-template-columns: 1fr; gap: 40px; padding: 48px 20px 40px; text-align: center; }
+    .hero-desc { margin: 0 auto 32px; }
+    .cta-row { justify-content: center; }
+    .phone-wrap { order: -1; }
+    .changelog-list { grid-template-columns: 1fr; }
+    .section { padding: 48px 20px; }
+    .footer-content { flex-direction: column; text-align: center; }
+    .footer-links { justify-content: center; }
+  }
+
+  @media (max-width: 480px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .audience-grid { grid-template-columns: 1fr 1fr; }
+    .new-banner { padding: 20px; gap: 16px; }
+    .new-items { justify-content: center; }
+    h1 { font-size: 38px; }
+    h2 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="app-badge"><span class="dot"></span> Version 2.7.5 — Now Available</div>
+    <h1>Edit<br>photos.<br><em>Smarter.</em></h1>
+    <p class="hero-desc">Remove backgrounds, upscale images, scan documents, and compress files — all from your phone, in seconds.</p>
+    <div class="cta-row">
+      <a href="#download" class="btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 3v13M5 14l7 7 7-7"/></svg>
+        Download Free
+      </a>
+      <a href="#features" class="btn-secondary">See features →</a>
+    </div>
+    <p class="version-tag">Latest: <strong>v2.7.5</strong> · Android · Free with Pro features</p>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-header">
+        <div class="phone-title">PixCut</div>
+        <div class="phone-sub">Edit Smarter</div>
+      </div>
+      <div class="phone-grid">
+        <div class="phone-card">
+          <div class="phone-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="white" stroke-width="1.8"/><path d="M9 9l6 6M15 9l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="phone-card-title">Background Removal</div>
+          <div class="phone-card-sub">Remove any background instantly</div>
+          <div class="phone-card-line"></div>
+        </div>
+        <div class="phone-card">
+          <div class="phone-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="phone-card-title">Image to Text</div>
+          <div class="phone-card-sub">Pull text from any image</div>
+          <div class="phone-card-line"></div>
+        </div>
+        <div class="phone-card">
+          <div class="phone-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="phone-card-title">Image Upscale</div>
+          <div class="phone-card-sub">Up to 4x resolution</div>
+          <div class="phone-card-line"></div>
+        </div>
+        <div class="phone-card">
+          <div class="phone-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="white" stroke-width="1.8"/><path d="M8 9h8M8 12h8M8 15h5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div class="phone-card-title">Document Scanner</div>
+          <div class="phone-card-sub">Scan & export to PDF</div>
+          <div class="phone-card-line"></div>
+        </div>
+        <div class="phone-card">
+          <div class="phone-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="white" stroke-width="1.8"/><path d="M8 12h8M12 8v8" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="phone-card-title">Translate</div>
+          <div class="phone-card-sub">Understand any language</div>
+          <div class="phone-card-line"></div>
+        </div>
+        <div class="phone-card">
+          <div class="phone-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v10M12 13l-3-3M12 13l3-3M5 17h14M5 21h14" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="phone-card-title">Compression</div>
+          <div class="phone-card-sub">Reduce size, keep quality</div>
+          <div class="phone-card-line"></div>
+        </div>
+      </div>
+      <div class="phone-nav">
+        <span>Home</span>
+        <span class="muted">Projects</span>
+        <span class="muted">Settings</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S NEW BANNER -->
+<div class="new-banner">
+  <span class="new-banner-label">What's new in 2.7.5</span>
+  <div class="new-items">
+    <span class="new-pill accent">4x Image Upscale</span>
+    <span class="new-pill">Document Scanner</span>
+    <span class="new-pill">Refreshed UI</span>
+    <span class="new-pill">Smart Updates</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-label">Core features</div>
+  <h2>Everything you need<br>to edit on the go.</h2>
+  <div class="features-grid">
+    <div class="feature-item">
+      <div class="feature-name">Background Removal</div>
+      <div class="feature-desc">One tap removes any background with AI precision. No selections, no masking.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-name">Image Upscaling</div>
+      <div class="feature-desc">Enhance resolution up to 4x. Old or blurry photos restored to crisp quality.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-name">Document Scanner</div>
+      <div class="feature-desc">Scan physical documents, auto-correct perspective, and export as PDF.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-name">Image to Text</div>
+      <div class="feature-desc">Extract text from any image instantly. Copy, share, or translate it.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-name">Translate</div>
+      <div class="feature-desc">Point your camera at foreign text and get an instant translation.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-name">Image Compression</div>
+      <div class="feature-desc">Reduce file sizes dramatically without visible loss in photo quality.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CHANGELOG -->
+<section class="section">
+  <div class="section-label">Release notes</div>
+  <h2>Version 2.7.5</h2>
+  <div class="changelog-wrap">
+    <div class="version-header">
+      <span class="version-number">v2.7.5</span>
+      <span class="version-date">Latest release · Android</span>
+    </div>
+    <ul class="changelog-list">
+      <li>Image Upscale — enhance quality up to 4x resolution</li>
+      <li>Document Scanner with PDF export support</li>
+      <li>Completely redesigned app interface</li>
+      <li>Smart one-tap automatic update system</li>
+      <li>AI background removal improvements</li>
+      <li>Faster processing across all features</li>
+      <li>Works on all Android devices</li>
+      <li>Enhanced in-app support system</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- WHO IT'S FOR -->
+<section class="section">
+  <div class="section-label">Who uses PixCut</div>
+  <h2>Built for anyone who<br>works with images.</h2>
+  <div class="audience-grid">
+    <div class="audience-card">
+      <span class="audience-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </span>
+      <div class="audience-label">Content Creators</div>
+    </div>
+    <div class="audience-card">
+      <span class="audience-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      </span>
+      <div class="audience-label">Social Media Managers</div>
+    </div>
+    <div class="audience-card">
+      <span class="audience-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </span>
+      <div class="audience-label">Business Professionals</div>
+    </div>
+    <div class="audience-card">
+      <span class="audience-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      </span>
+      <div class="audience-label">Students</div>
+    </div>
+    <div class="audience-card">
+      <span class="audience-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+      </span>
+      <div class="audience-label">Photo Editors</div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM CTA -->
+<section class="bottom-cta" id="download">
+  <h2>Download <em>PixCut.</em><br>Edit smarter.</h2>
+  <p>Free to download. Available on all Android devices.</p>
+  <a href="#" class="btn-white">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 3v13M5 14l7 7 7-7"/></svg>
+    Get PixCut Free
+  </a>
+  <div class="store-row">
+    <span class="store-badge">APKPure</span>
+    <span class="store-badge">APKMirror</span>
+    <span class="store-badge">Uptodown</span>
+    <span class="store-badge">APKCombo</span>
+    <span class="store-badge">Softonic</span>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Use</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="copyright">
+      © 2026 LBS. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
